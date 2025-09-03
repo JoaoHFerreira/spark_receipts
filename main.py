@@ -4,7 +4,7 @@ from pyspark.sql.functions import col, when, avg, count, round
 spark = (
     SparkSession.builder
     .appName("CSV Reader")
-    .config("spark.driver.bindAddress", "127.0.0.1")  # explicitly bind to localhost
+    .config("spark.driver.bindAddress", "127.0.0.1")  
     .getOrCreate()
 )
 
@@ -12,10 +12,10 @@ df = spark.read.csv("/Users/joao-henrique.ferreira/personal_repos/journal/sandbo
 
 
 
-# Renomear coluna '2urvived' para 'Survived' para facilitar
+
 df = df.withColumnRenamed("2urvived", "Survived")
 
-# Criar coluna "age_group"
+
 df = df.withColumn(
     "age_group",
     when(col("Age") >= 50, "Senior")
@@ -23,10 +23,10 @@ df = df.withColumn(
     .otherwise("Child")
 )
 
-# Filtrar passageiros com tarifa paga maior que zero
+
 df_filtered = df.filter(col("Fare") > 0)
 
-# Agregar: taxa de sobrevivência média e contagem por sexo e classe
+
 df_agg = (
     df_filtered.groupBy("Sex", "Pclass", "age_group")
     .agg(
@@ -36,8 +36,8 @@ df_agg = (
     )
 )
 
-# Ordenar por classe e taxa de sobrevivência
+
 df_result = df_agg.orderBy(col("Pclass"), col("avg_survival_rate").desc())
 
-# Mostrar resultado
+
 df_result.show(truncate=False)
